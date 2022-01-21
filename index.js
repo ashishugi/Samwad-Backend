@@ -5,12 +5,16 @@ const cookieParser = require("cookie-parser");
 
 const db = require("./config/mongoose");
 
+//cors error
+const cors = require("cors");
+
 //used for session cookie
 const session = require("express-session");
 const bodyParser = require("body-parser");
 
-const PORT = 8000; // by default runs at port : 80
+const PORT = process.env.PORT; // by default runs at port : 80
 
+app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: true })); // for post request
 app.use(cookieParser());
 app.use(bodyParser.json());

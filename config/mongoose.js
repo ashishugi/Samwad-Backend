@@ -1,8 +1,8 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-
+const MongoDBURL = process.env.MONGODB_URL;
 mongoose.connect(
-  "mongodb://localhost/Samwad",
+  MongoDBURL,
   { useNewUrlParser: true, useUnifiedTopology: true },
   function (err) {
     if (err) throw err;

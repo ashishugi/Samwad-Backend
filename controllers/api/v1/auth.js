@@ -7,6 +7,8 @@ module.exports.index = function (req, res) {
 
 module.exports.login = async function (req, res) {
   try {
+    console.log('________******_______');
+    console.log(req.body)
     const { email, password } = req.body;
     if (!(email && password)) {
       res.status(400).send("All input is required");
@@ -31,7 +33,10 @@ module.exports.login = async function (req, res) {
       });
       return;
     }
-    res.status(200).send("Invalid Credentials");
+    res.status(200).json({
+      success: false,
+      message: 'Invalid Cridential'
+    });
   } catch (err) {
     console.log;
     console.log(err);
