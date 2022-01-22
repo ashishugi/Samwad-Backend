@@ -7,13 +7,18 @@ module.exports.index = function (req, res) {
 
 module.exports.login = async function (req, res) {
   try {
-    console.log('________******_______');
-    console.log(req.body)
+    console.log("________******_______");
+    console.log(req.body);
     const { email, password } = req.body;
     if (!(email && password)) {
-      res.status(400).send("All input is required");
+      res.status(400).json({
+        success: false,
+        message: "Enter Valid username and password",
+      });
     }
     const user = await User.findOne({ email });
+    console.log("@login data");
+    console.log(user);
     if (user && user.password === password) {
       const token = jwt.sign(
         { user_id: user._id, email },
@@ -35,7 +40,7 @@ module.exports.login = async function (req, res) {
     }
     res.status(200).json({
       success: false,
-      message: 'Invalid Cridential'
+      message: "Invalid Cridential",
     });
   } catch (err) {
     console.log;
@@ -45,36 +50,43 @@ module.exports.login = async function (req, res) {
 
 module.exports.register = async function (req, res) {
   const userData = req.body;
-  User.findOne({ email: userData.email }, function (err, user) {
-    if (err) {
-      return res.status(400).json({
-        success: false,
-        message: "something went wrong, Please try again",
+  console.log("reached @register");
+  console.log(userData);
+  try {
+    let user = await User.findOne({ email: userData.email });
+    if (user) {
+      return res.status(200).json({
+        success: true,
+        message: "User with this email already exist",
       });
-    }
-
-    if (!user) {
-      User.create(
-        {
-          email: userData.email,
-          password: userData.password,
-          name: userData.name,
-        },
-        function (err, user) {
-          if (err) {
-            return;
-          }
+    } else {
+      console.log("reached here 61");
+      user = new User({
+        email: userData.email,
+        password: userData.password,
+        name: userData.name,
+      });
+      await user.save(function (err) {
+        if (err) {
           return res.status(200).json({
-            success: true,
-            message: "User successfully saved!",
+            success: false,
+            message: "Some unexpected error occurred",
+            err: err,
           });
         }
-      );
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "Already User exist with same email",
+        return res.status(200).json({
+          success: true,
+          message: "User Saved successfully !!!",
+          data: {
+            user: user,
+          },
+        });
       });
     }
-  });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
 };
